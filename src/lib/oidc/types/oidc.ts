@@ -3,6 +3,7 @@ export type OIDCIdTokenSigningAlgValues = "RS256" | "HS256" | "ES256" | "PS256" 
 export type OIDCScopes = "openid" | "profile" | "email" | "address" | "phone" | "offline_access";
 export type OIDCCodeChallengeMethods = "S256" | "plain";
 export type OIDCGrantTypes = "authorization_code" | "refresh_token" | "client_credentials";
+export type FlowType = "authorization_code" | "implicit" | "hybrid";
 
 export type OIDCResponseTypes =
   | "code"
@@ -102,4 +103,12 @@ export type AuthorizationResponse = {
   error?: string;
   error_description?: string;
   error_uri?: string;
+};
+
+export type ClientMetadata = {
+  clientId: string;
+  redirectUris: string[];
+  responseTypes: string[];
+  grantTypes: string[];
+  tokenEndpointAuthMethod?: string;
 };
