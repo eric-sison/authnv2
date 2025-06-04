@@ -2,10 +2,10 @@ import { AuthorizationService } from "@/lib/oidc/services/authorization-service"
 import { AuthorizationRequest } from "@/lib/oidc/types/oidc";
 import { beforeEach, describe, expect, it } from "vitest";
 
-let baseAuthorizationRequest: AuthorizationRequest;
+let request: AuthorizationRequest;
 
 beforeEach(() => {
-  baseAuthorizationRequest = {
+  request = {
     clientId: "client-1234",
     redirectUri: "http://example.com/callback",
     responseType: "code",
@@ -15,8 +15,9 @@ beforeEach(() => {
 
 describe("Test the returned flow type based on requested response_type", () => {
   const authorizationService = new AuthorizationService();
+
   it("Should return authorization_code", () => {
-    authorizationService.initiateFlow(baseAuthorizationRequest);
+    authorizationService.processAuthorizationRequest(request);
     expect(authorizationService.getFlowType()).toEqual("authorization_code");
   });
 
@@ -25,17 +26,17 @@ describe("Test the returned flow type based on requested response_type", () => {
    */
 
   it("Should return implicit: (token only)", () => {
-    authorizationService.initiateFlow({ ...baseAuthorizationRequest, responseType: "token" });
+    authorizationService.processAuthorizationRequest({ ...request, responseType: "token" });
     expect(authorizationService.getFlowType()).toEqual("implicit");
   });
 
   it("Should return implicit: (id_token only)", () => {
-    authorizationService.initiateFlow({ ...baseAuthorizationRequest, responseType: "id_token" });
+    authorizationService.processAuthorizationRequest({ ...request, responseType: "id_token" });
     expect(authorizationService.getFlowType()).toEqual("implicit");
   });
 
   it("Should return implicit: (both tokens)", () => {
-    authorizationService.initiateFlow({ ...baseAuthorizationRequest, responseType: "id_token token" });
+    authorizationService.processAuthorizationRequest({ ...request, responseType: "id_token token" });
     expect(authorizationService.getFlowType()).toEqual("implicit");
   });
 
@@ -44,17 +45,17 @@ describe("Test the returned flow type based on requested response_type", () => {
    */
 
   it("Should return hybrid: (code and id_token only)", () => {
-    authorizationService.initiateFlow({ ...baseAuthorizationRequest, responseType: "code id_token" });
+    authorizationService.processAuthorizationRequest({ ...request, responseType: "code id_token" });
     expect(authorizationService.getFlowType()).toEqual("hybrid");
   });
 
   it("Should return hybrid: (code and token only)", () => {
-    authorizationService.initiateFlow({ ...baseAuthorizationRequest, responseType: "code token" });
+    authorizationService.processAuthorizationRequest({ ...request, responseType: "code token" });
     expect(authorizationService.getFlowType()).toEqual("hybrid");
   });
 
   it("Should return hybrid: (everything)", () => {
-    authorizationService.initiateFlow({ ...baseAuthorizationRequest, responseType: "code id_token token" });
+    authorizationService.processAuthorizationRequest({ ...request, responseType: "code id_token token" });
     expect(authorizationService.getFlowType()).toEqual("hybrid");
   });
 });
