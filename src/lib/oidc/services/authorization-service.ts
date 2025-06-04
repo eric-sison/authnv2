@@ -5,7 +5,9 @@ export class AuthorizationService implements I_AuthorizationService {
   private flowType: FlowType | undefined;
 
   async processAuthorizationRequest(request: AuthorizationRequest): Promise<AuthorizationResponse> {
+    this.validateAuthorizationRequest(request);
     await this.initiateFlow(request);
+
     return {};
   }
 
@@ -35,7 +37,7 @@ export class AuthorizationService implements I_AuthorizationService {
 
       // throw error
       default:
-        throw new Error("response_type is not supported!");
+        throw new Error(`Unsupported response_type: ${request.responseType}`);
     }
   }
 
