@@ -89,6 +89,10 @@ export class OIDCConfigService {
     }
   }
 
+  /**
+   *  Getter functions
+   */
+
   public getIssuer() {
     return this.config.issuer;
   }
