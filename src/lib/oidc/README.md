@@ -1,8 +1,12 @@
 # Authorization Code Flow:
 
-`response_type=code`
+- Always generate an authorization code
+- Support **PKCE** for public clients
+- Redirect with `?code=...`
 
 ```typescript
+// response_type=code
+
 {
     code: "SplxlOBeZQQYbYS6WxSbIA",
     state: request.state
@@ -11,9 +15,13 @@
 
 # Implicit Flows:
 
-`response_type=token` (Access token only)
+- Issue `access_token`, `id_token` immediately (no backchannel)
+- Use `nonce` to prevent replay attacks
+- Redirect using **fragment** `#id_token=...&access_token=...`
 
 ```typescript
+// response_type=token (Access token only)
+
 {
   access_token: "SlAV32hkKG",
   token_type: "Bearer",
@@ -22,18 +30,18 @@
 }
 ```
 
-`response_type=id_token` (ID token only)
-
 ```typescript
+// response_type=id_token (ID token only)
+
 {
   id_token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
   state: request.state
 }
 ```
 
-`response_type=id_token token` (Both tokens)
-
 ```typescript
+// response_type=id_token token (Both tokens)
+
 {
   access_token: "SlAV32hkKG",
   token_type: "Bearer",
@@ -45,9 +53,12 @@
 
 # Hybrid Flows:
 
-`response_type=code id_token`
+- Issue **authorization_code + id_token**, or **code + token**, or all three
+- Return `?code=...` + `id_token=...` (fragment or query)
 
 ```typescript
+// response_type=code id_token
+
 {
   code: "SplxlOBeZQQYbYS6WxSbIA",
   id_token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -55,9 +66,9 @@
 }
 ```
 
-`response_type=code token`
-
 ```typescript
+// response_type=code token
+
 {
   code: "SplxlOBeZQQYbYS6WxSbIA",
   access_token: "SlAV32hkKG",
@@ -67,9 +78,9 @@
 }
 ```
 
-`responnse_type=code id_token token` (Everything)
-
 ```typescript
+// response_type=code id_token token (Everything)
+
 {
   code: "SplxlOBeZQQYbYS6WxSbIA",
   access_token: "SlAV32hkKG",
