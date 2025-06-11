@@ -76,14 +76,14 @@ export type DiscoveryDocument = {
 };
 
 export type AuthorizationRequest = {
-  clientId: string;
-  redirectUri: string;
+  client_id: string;
+  redirect_uri: string;
   scope: string;
-  responseType: OIDCResponseTypes;
+  response_type: string; // OIDCResponseTypes
   state?: string;
   nonce?: string;
-  codeChallenge?: string;
-  codeChallengeMethod?: OIDCCodeChallengeMethods;
+  code_challenge?: string;
+  code_challenge_method?: string; // OIDCCodeChallengeMethods
 };
 
 export type AuthorizationResponse = {
@@ -105,10 +105,11 @@ export type AuthorizationResponse = {
   error_uri?: string;
 };
 
-export type ClientMetadata = {
+export type Client = {
   clientId: string;
   redirectUris: string[];
   responseTypes: string[];
   grantTypes: string[];
   tokenEndpointAuthMethod?: string;
+  active: boolean;
 };

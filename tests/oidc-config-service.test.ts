@@ -1,4 +1,4 @@
-import { OIDCConfigService } from "@/lib/oidc/services/oidc-config-service";
+import { OIDCConfigService } from "@/lib/oidc/services/OIDCConfigService";
 import { OIDCProvider } from "@/lib/oidc/types/oidc";
 import { beforeEach, describe, expect, it } from "vitest";
 

@@ -1,26 +1,14 @@
-import { I_AuthorizationService } from "../interfaces/authorization";
 import { AuthorizationRequest, AuthorizationResponse, FlowType } from "../types/oidc";
 
-export class AuthorizationService implements I_AuthorizationService {
+export class FlowService {
   private flowType: FlowType | undefined;
-
-  async processAuthorizationRequest(request: AuthorizationRequest): Promise<AuthorizationResponse> {
-    this.validateAuthorizationRequest(request);
-    await this.initiateFlow(request);
-
-    return {};
-  }
-
-  public validateAuthorizationRequest(request: AuthorizationRequest): void {
-    throw new Error("Method not implemented.");
-  }
 
   public getFlowType() {
     return this.flowType;
   }
 
-  private async initiateFlow(request: AuthorizationRequest) {
-    this.flowType = this.setFlowType(request.responseType);
+  public async initiateFlow(request: AuthorizationRequest) {
+    this.flowType = this.setFlowType(request.response_type);
 
     switch (this.flowType) {
       // authorization code flow
@@ -37,7 +25,7 @@ export class AuthorizationService implements I_AuthorizationService {
 
       // throw error
       default:
-        throw new Error(`Unsupported response_type: ${request.responseType}`);
+        throw new Error(`Unsupported response_type: ${request.response_type}`);
     }
   }
 
@@ -68,17 +56,6 @@ export class AuthorizationService implements I_AuthorizationService {
     return {};
   }
 
-  /**
-   * Determines the OpenID Connect flow type based on the `response_type` parameter.
-   *
-   * Rules:
-   * - Returns `"hybrid"` if `response_type` includes "code" **and** either "token" or "id_token".
-   * - Returns `"authorization_code"` if `response_type` includes only "code".
-   * - Returns `"implicit"` if `response_type` includes "token", "id_token", or both, without "code".
-   *
-   * @param {string} responseType - A space-delimited string of OIDC response types (e.g., "code", "token id_token").
-   * @returns {FlowType} - The determined flow type: "authorization_code", "implicit", or "hybrid".
-   */
   private setFlowType(responseType: string): FlowType {
     // Split the response_type string by whitespace and sort the parts
     const parts = responseType.trim().split(/\s+/).sort();

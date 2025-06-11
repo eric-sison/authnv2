@@ -1,4 +1,4 @@
-import { isValidUrl } from "@/utils/is-valid-url";
+import { isValidUrl } from "@/utils/isValidUrl";
 import type { DiscoveryDocument, OIDCProvider } from "../types/oidc";
 
 export class OIDCConfigService {
