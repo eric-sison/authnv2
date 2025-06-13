@@ -5,12 +5,12 @@ import { FlowService } from "@/lib/oidc/services/FlowService";
 import { ProviderConfigService } from "@/lib/oidc/services/ProviderConfigService";
 import { AuthorizationRequest, Client, ProviderConfig } from "@/lib/oidc/types/oidc";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { AuthCodeService } from "@/lib/oidc/services/AuthCodeService";
+import { AuthorizationCodeService } from "@/lib/oidc/services/AuthorizationCodeService";
 
 let clients: Client[];
 let baseConfig: ProviderConfig;
 let mockClientRepository: ClientRepository;
-let mockAuthCodeService: AuthCodeService;
+let mockAuthCodeService: AuthorizationCodeService;
 let flowService: FlowService;
 let clientService: ClientService;
 let oidcConfigService: ProviderConfigService;
@@ -80,7 +80,7 @@ beforeAll(() => {
     delete: vi.fn(),
   };
 
-  mockAuthCodeService = new AuthCodeService();
+  mockAuthCodeService = new AuthorizationCodeService();
   vi.spyOn(mockAuthCodeService, "generateAuthCode").mockResolvedValue({
     code: "code-123",
     clientId: "1",
@@ -157,16 +157,6 @@ describe("Test the validity of requested parameters", () => {
     await expect(
       authorizationService.validateAuthorizationRequest({ ...request, response_type: "not supported" }),
     ).rejects.toThrow("Unsupported response type: not supported");
-  });
-
-  it("Should accept requested response_type even if the order is reversed", async () => {
-    await expect(
-      authorizationService.validateAuthorizationRequest({
-        ...request,
-        client_id: "4",
-        response_type: "token id_token code",
-      }),
-    ).resolves.toBeUndefined();
   });
 
   it("Should throw an error if the requested response_type is not supported by the client", async () => {

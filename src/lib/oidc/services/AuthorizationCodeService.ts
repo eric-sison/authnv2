@@ -1,7 +1,7 @@
 import { generateCuid } from "@/utils/generateCuid";
 import { AuthorizationCode, AuthorizationCodePayload } from "../types/oidc";
 
-export class AuthCodeService {
+export class AuthorizationCodeService {
   private readonly codeExpirationTime: number = 600; // 10 minutes
 
   public generateAuthCode(payload: AuthorizationCodePayload, expiration?: number) {

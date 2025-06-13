@@ -1,5 +1,5 @@
 import { normalizer } from "@/utils/normalizer";
-import { AuthCodeService } from "./AuthCodeService";
+import { AuthorizationCodeService } from "./AuthorizationCodeService";
 import {
   AuthorizationRequest,
   AuthorizationResponse,
@@ -24,7 +24,7 @@ export class FlowService {
    */
   private OIDCFlow: OIDCFlow | undefined;
 
-  constructor(private readonly authCodeService: AuthCodeService) {}
+  constructor(private readonly authCodeService: AuthorizationCodeService) {}
 
   /**
    * Returns the current flow type.

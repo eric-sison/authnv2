@@ -1,4 +1,4 @@
-import { AuthCodeService } from "@/lib/oidc/services/AuthCodeService";
+import { AuthorizationCodeService } from "@/lib/oidc/services/AuthorizationCodeService";
 import { FlowService } from "@/lib/oidc/services/FlowService";
 import { AuthorizationRequest, User } from "@/lib/oidc/types/oidc";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -26,7 +26,7 @@ beforeEach(() => {
 });
 
 describe("Test oidc flow based on requested response_type", () => {
-  const authCodeService = new AuthCodeService();
+  const authCodeService = new AuthorizationCodeService();
   const flowService = new FlowService(authCodeService);
 
   it("Should return authorization_code", () => {
@@ -69,12 +69,12 @@ describe("Test oidc flow based on requested response_type", () => {
    * Check normalization
    */
   it("Should return hybrid: (unordered response_type)", () => {
-    expect(flowService.resolveOIDCFlow("token code id_token")).toEqual("hybrid");
+    expect(flowService.resolveOIDCFlow("token id_token code")).toEqual("hybrid");
   });
 });
 
 describe("Test authorization_code flow", () => {
-  const authCodeService = new AuthCodeService();
+  const authCodeService = new AuthorizationCodeService();
   const flowService = new FlowService(authCodeService);
 
   it("Should return authorization response", () => {
