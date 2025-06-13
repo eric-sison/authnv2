@@ -154,6 +154,7 @@ export type AuthorizationCode = {
   userId: string;
   redirectUri: string;
   scope: OIDCScopes[];
+  issuedAt: Date;
   expiresAt: Date;
   codeChallenge?: string;
   codeChallengeMethod?: OIDCCodeChallengeMethods;

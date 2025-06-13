@@ -14,6 +14,7 @@ export class AuthCodeService {
       ...payload,
       code,
       used: false,
+      issuedAt: new Date(),
       expiresAt,
     };
 
