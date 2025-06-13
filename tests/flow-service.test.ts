@@ -30,8 +30,7 @@ describe("Test oidc flow based on requested response_type", () => {
   const flowService = new FlowService(authCodeService);
 
   it("Should return authorization_code", () => {
-    flowService.initiateFlow(request, user);
-    expect(flowService.getOIDCFlow()).toEqual("authorization_code");
+    expect(flowService.resolveOIDCFlow("code")).toEqual("authorization_code");
   });
 
   /**
@@ -39,18 +38,15 @@ describe("Test oidc flow based on requested response_type", () => {
    */
 
   it("Should return implicit: (token only)", () => {
-    flowService.initiateFlow({ ...request, response_type: "token" }, user);
-    expect(flowService.getOIDCFlow()).toEqual("implicit");
+    expect(flowService.resolveOIDCFlow("token")).toEqual("implicit");
   });
 
   it("Should return implicit: (id_token only)", () => {
-    flowService.initiateFlow({ ...request, response_type: "id_token" }, user);
-    expect(flowService.getOIDCFlow()).toEqual("implicit");
+    expect(flowService.resolveOIDCFlow("ti_token")).toEqual("implicit");
   });
 
   it("Should return implicit: (both tokens)", () => {
-    flowService.initiateFlow({ ...request, response_type: "id_token token" }, user);
-    expect(flowService.getOIDCFlow()).toEqual("implicit");
+    expect(flowService.resolveOIDCFlow("id_token token")).toEqual("implicit");
   });
 
   /**
@@ -58,18 +54,15 @@ describe("Test oidc flow based on requested response_type", () => {
    */
 
   it("Should return hybrid: (code and id_token only)", () => {
-    flowService.initiateFlow({ ...request, response_type: "code id_token" }, user);
-    expect(flowService.getOIDCFlow()).toEqual("hybrid");
+    expect(flowService.resolveOIDCFlow("code id_token")).toEqual("hybrid");
   });
 
   it("Should return hybrid: (code and token only)", () => {
-    flowService.initiateFlow({ ...request, response_type: "code token" }, user);
-    expect(flowService.getOIDCFlow()).toEqual("hybrid");
+    expect(flowService.resolveOIDCFlow("code token")).toEqual("hybrid");
   });
 
   it("Should return hybrid: (everything)", () => {
-    flowService.initiateFlow({ ...request, response_type: "code id_token token" }, user);
-    expect(flowService.getOIDCFlow()).toEqual("hybrid");
+    expect(flowService.resolveOIDCFlow("code id_token token")).toEqual("hybrid");
   });
 });
 

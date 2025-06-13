@@ -52,7 +52,7 @@ export class FlowService {
    * @throws Error if the response_type is unsupported or unrecognized.
    */
   public initiateFlow(request: AuthorizationRequest, user: User): AuthorizationResponse {
-    this.OIDCFlow = this.setOIDCFlow(request.response_type);
+    this.OIDCFlow = this.resolveOIDCFlow(request.response_type);
 
     switch (this.OIDCFlow) {
       // handle authorization code flow
@@ -139,7 +139,7 @@ export class FlowService {
    * @param responseType The response_type string from the request.
    * @returns The determined OIDCFlow.
    */
-  private setOIDCFlow(responseType: string): OIDCFlow {
+  public resolveOIDCFlow(responseType: string): OIDCFlow {
     const normalized = normalizer(responseType);
     const parts = normalized.split(" ");
 

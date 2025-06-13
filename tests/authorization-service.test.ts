@@ -39,6 +39,13 @@ beforeAll(() => {
       grantTypes: ["authorization_code"],
       active: true,
     },
+    {
+      clientId: "5",
+      redirectUris: ["https://example.com/callback"],
+      responseTypes: ["code", "token"],
+      grantTypes: ["authorization_code"],
+      active: true,
+    },
   ];
 
   baseConfig = {
@@ -170,5 +177,15 @@ describe("Test the validity of requested parameters", () => {
         response_type: "code id_token",
       }),
     ).rejects.toThrow(`Response type "code id_token" is not allowed for client 1`);
+  });
+
+  it("Should throw an error if nonce is undefined and flow is implicit", async () => {
+    await expect(
+      authorizationService.validateAuthorizationRequest({
+        ...request,
+        client_id: "5",
+        response_type: "token",
+      }),
+    ).rejects.toThrow("Nonce is required for implicit flow");
   });
 });

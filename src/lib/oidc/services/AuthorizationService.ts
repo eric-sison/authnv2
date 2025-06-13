@@ -21,7 +21,7 @@ export class AuthorizationService {
    * @param oidcConfigService Service providing OIDC provider metadata and configuration validation.
    */
   constructor(
-    private readonly oidcFlowService: FlowService,
+    private readonly flowService: FlowService,
     private readonly clientService: ClientService,
     private readonly oidcConfigService: ProviderConfigService,
   ) {}
@@ -50,7 +50,7 @@ export class AuthorizationService {
     }
 
     await this.validateAuthorizationRequest(request);
-    return this.oidcFlowService.initiateFlow(request, user);
+    return this.flowService.initiateFlow(request, user);
   }
 
   /**
@@ -72,6 +72,7 @@ export class AuthorizationService {
     this.validateScope(request.scope);
     this.assertResponseTypeSupported(request.response_type);
     this.assertResponseTypeAllowedForClient(client, request.response_type);
+    this.checkForNonce(request);
   }
 
   /**
@@ -140,6 +141,14 @@ export class AuthorizationService {
 
     if (!isAllowed) {
       throw new Error(`Response type "${responseType}" is not allowed for client ${client.clientId}`);
+    }
+  }
+
+  private checkForNonce(request: AuthorizationRequest) {
+    const flow = this.flowService.resolveOIDCFlow(request.response_type);
+
+    if (flow === "implicit" && !request.nonce) {
+      throw new Error("Nonce is required for implicit flow");
     }
   }
 }
