@@ -1,3 +1,8 @@
 export const normalizer = (str: string) => {
-  return str.trim().split(/\s+/).sort().join(" ");
+  return str
+    .trim()
+    .split(/\s+/)
+    .map((s) => s.toLowerCase())
+    .sort()
+    .join(" ");
 };

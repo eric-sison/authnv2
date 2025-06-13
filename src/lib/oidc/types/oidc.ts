@@ -3,7 +3,7 @@ export type OIDCIdTokenSigningAlgValues = "RS256" | "HS256" | "ES256" | "PS256" 
 export type OIDCScopes = "openid" | "profile" | "email" | "address" | "phone" | "offline_access";
 export type OIDCCodeChallengeMethods = "S256" | "plain";
 export type OIDCGrantTypes = "authorization_code" | "refresh_token" | "client_credentials";
-export type FlowType = "authorization_code" | "implicit" | "hybrid";
+export type OIDCFlow = "authorization_code" | "implicit" | "hybrid";
 
 export type OIDCResponseTypes =
   | "code"
@@ -89,6 +89,7 @@ export type AuthorizationRequest = {
 export type AuthorizationResponse = {
   // For Authorization Code flow
   code?: string;
+  redirect_uri?: string;
 
   // For Implicit flows
   access_token?: string;
@@ -98,6 +99,7 @@ export type AuthorizationResponse = {
 
   // Always included
   state?: string; // Echo back the client's state
+  nonce?: string;
 
   // Error cases
   error?: string;
@@ -112,4 +114,57 @@ export type Client = {
   grantTypes: string[];
   tokenEndpointAuthMethod?: string;
   active: boolean;
+};
+
+export type User = {
+  id: string;
+  isActive: boolean;
+  name?: string;
+  givenName?: string;
+  familyName?: string;
+  middleName?: string;
+  nickname?: string;
+  preferredUsername?: string;
+  profile?: string;
+  website?: string;
+  gender?: "Male" | "Female";
+  birthdate?: Date;
+  zoneinfo?: string;
+  locale?: string;
+  phoneNumber?: string;
+  phoneNumberVerified: boolean;
+  address?: {
+    formatted?: string;
+    street_address?: string;
+    locality?: string;
+    region?: string;
+    postal_code?: string;
+    country?: string;
+  };
+  email: string;
+  emailVerified: boolean;
+  picture?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type AuthorizationCode = {
+  code: string;
+  clientId: string;
+  userId: string;
+  redirectUri: string;
+  scope: OIDCScopes[];
+  expiresAt: Date;
+  codeChallenge?: string;
+  codeChallengeMethod?: OIDCCodeChallengeMethods;
+  used: boolean;
+};
+
+export type AuthorizationCodePayload = {
+  userId: string;
+  clientId: string;
+  scope: OIDCScopes[];
+  redirectUri: string;
+  codeChallenge?: string;
+  codeChallengeMethod?: OIDCCodeChallengeMethods;
 };

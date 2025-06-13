@@ -1,15 +1,17 @@
 import { ClientRepository } from "@/lib/oidc/repositories/ClientRepository";
 import { AuthorizationService } from "@/lib/oidc/services/AuthorizationService";
 import { ClientService } from "@/lib/oidc/services/ClientService";
-import { FlowService } from "@/lib/oidc/services/FlowService";
+import { OIDCFlowService } from "@/lib/oidc/services/OIDCFlowService";
 import { OIDCConfigService } from "@/lib/oidc/services/OIDCConfigService";
 import { AuthorizationRequest, Client, OIDCProvider } from "@/lib/oidc/types/oidc";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { AuthCodeService } from "@/lib/oidc/services/AuthCodeService";
 
 let clients: Client[];
 let baseConfig: OIDCProvider;
 let mockClientRepository: ClientRepository;
-let flowService: FlowService;
+let mockAuthCodeService: AuthCodeService;
+let flowService: OIDCFlowService;
 let clientService: ClientService;
 let oidcConfigService: OIDCConfigService;
 let authorizationService: AuthorizationService;
@@ -71,7 +73,18 @@ beforeAll(() => {
     delete: vi.fn(),
   };
 
-  flowService = new FlowService();
+  mockAuthCodeService = new AuthCodeService();
+  vi.spyOn(mockAuthCodeService, "generateAuthCode").mockResolvedValue({
+    code: "code-123",
+    clientId: "1",
+    expiresAt: new Date(),
+    redirectUri: "https://test.example/callback",
+    scope: ["email", "openid"],
+    used: false,
+    userId: "user1",
+  });
+
+  flowService = new OIDCFlowService(mockAuthCodeService);
   clientService = new ClientService(mockClientRepository);
   oidcConfigService = new OIDCConfigService(baseConfig);
   authorizationService = new AuthorizationService(flowService, clientService, oidcConfigService);

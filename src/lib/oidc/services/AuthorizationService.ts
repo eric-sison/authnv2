@@ -1,6 +1,6 @@
-import { AuthorizationRequest, AuthorizationResponse, Client } from "../types/oidc";
+import { AuthorizationRequest, AuthorizationResponse, Client, User } from "../types/oidc";
 import { ClientService } from "./ClientService";
-import { FlowService } from "./FlowService";
+import { OIDCFlowService } from "./OIDCFlowService";
 import { OIDCConfigService } from "./OIDCConfigService";
 import { isValidUrl } from "@/utils/isValidUrl";
 
@@ -21,21 +21,36 @@ export class AuthorizationService {
    * @param oidcConfigService Service providing OIDC provider metadata and configuration validation.
    */
   constructor(
-    private readonly flowService: FlowService,
+    private readonly oidcFlowService: OIDCFlowService,
     private readonly clientService: ClientService,
     private readonly oidcConfigService: OIDCConfigService,
   ) {}
 
   /**
-   * Processes an incoming authorization request by validating it and initiating the proper authorization flow.
+   * Processes an incoming authorization request by validating the request parameters and initiating
+   * the appropriate OpenID Connect flow (Authorization Code, Implicit, or Hybrid).
    *
-   * @param request The authorization request received from the client.
-   * @returns A placeholder authorization response (token issuance not yet implemented).
+   * This method first verifies that:
+   * - The client exists and is authorized to perform the requested flow.
+   * - The requested scopes are valid and supported.
+   * - The response_type is supported both by the provider and the client.
+   * - (Optional: Additional validations can be added, such as PKCE, redirect_uri, etc.)
+   *
+   * Once validated, it delegates the processing to the OIDC flow service to handle
+   * the actual flow-specific logic.
+   *
+   * @param request - The authorization request received from the client application.
+   * @param userId - The ID of the authenticated user (if applicable); may be null for unauthenticated requests.
+   * @returns A promise that resolves to an AuthorizationResponse (token issuance logic may be implemented separately).
    * @throws Error if any validation step fails.
    */
-  async processAuthorizationRequest(request: AuthorizationRequest): Promise<AuthorizationResponse> {
+  async authorize(request: AuthorizationRequest, user: User | null): Promise<AuthorizationResponse> {
+    if (!user) {
+      throw new Error("Unauthenticated user");
+    }
+
     await this.validateAuthorizationRequest(request);
-    return await this.flowService.initiateFlow(request);
+    return this.oidcFlowService.initiateFlow(request, user);
   }
 
   /**
