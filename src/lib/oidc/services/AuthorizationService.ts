@@ -147,7 +147,7 @@ export class AuthorizationService {
   private checkForNonce(request: AuthorizationRequest) {
     const flow = this.flowService.resolveOIDCFlow(request.response_type);
 
-    if (flow === "implicit" && !request.nonce) {
+    if ((flow === "implicit" || flow === "hybrid") && !request.nonce) {
       throw new Error("Nonce is required for implicit flow");
     }
   }
