@@ -1,6 +1,6 @@
 import { AuthorizationRequest, AuthorizationResponse, Client, User } from "../types/oidc";
 import { ClientService } from "./ClientService";
-import { OIDCFlowService } from "./OIDCFlowService";
+import { FlowService } from "./FlowService";
 import { OIDCConfigService } from "./OIDCConfigService";
 import { isValidUrl } from "@/utils/isValidUrl";
 
@@ -21,7 +21,7 @@ export class AuthorizationService {
    * @param oidcConfigService Service providing OIDC provider metadata and configuration validation.
    */
   constructor(
-    private readonly oidcFlowService: OIDCFlowService,
+    private readonly oidcFlowService: FlowService,
     private readonly clientService: ClientService,
     private readonly oidcConfigService: OIDCConfigService,
   ) {}

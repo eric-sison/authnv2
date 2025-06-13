@@ -18,7 +18,7 @@ import {
  * - Implicit Flow
  * - Hybrid Flow
  */
-export class OIDCFlowService {
+export class FlowService {
   /**
    * Holds the determined flow type for the current request.
    */

@@ -1,5 +1,5 @@
 import { AuthCodeService } from "@/lib/oidc/services/AuthCodeService";
-import { OIDCFlowService } from "@/lib/oidc/services/OIDCFlowService";
+import { FlowService } from "@/lib/oidc/services/FlowService";
 import { AuthorizationRequest, User } from "@/lib/oidc/types/oidc";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -27,7 +27,7 @@ beforeEach(() => {
 
 describe("Test oidc flow based on requested response_type", () => {
   const authCodeService = new AuthCodeService();
-  const flowService = new OIDCFlowService(authCodeService);
+  const flowService = new FlowService(authCodeService);
 
   it("Should return authorization_code", () => {
     flowService.initiateFlow(request, user);
@@ -75,7 +75,7 @@ describe("Test oidc flow based on requested response_type", () => {
 
 describe("Test authorization_code flow", () => {
   const authCodeService = new AuthCodeService();
-  const flowService = new OIDCFlowService(authCodeService);
+  const flowService = new FlowService(authCodeService);
 
   it("Should return authorization response", () => {
     const response = flowService.initiateFlow(request, user);
