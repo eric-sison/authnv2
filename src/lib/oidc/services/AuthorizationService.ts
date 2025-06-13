@@ -1,7 +1,7 @@
 import { AuthorizationRequest, AuthorizationResponse, Client, User } from "../types/oidc";
 import { ClientService } from "./ClientService";
 import { FlowService } from "./FlowService";
-import { OIDCConfigService } from "./OIDCConfigService";
+import { ProviderConfigService } from "./ProviderConfigService";
 import { isValidUrl } from "@/utils/isValidUrl";
 
 /**
@@ -23,7 +23,7 @@ export class AuthorizationService {
   constructor(
     private readonly oidcFlowService: FlowService,
     private readonly clientService: ClientService,
-    private readonly oidcConfigService: OIDCConfigService,
+    private readonly oidcConfigService: ProviderConfigService,
   ) {}
 
   /**

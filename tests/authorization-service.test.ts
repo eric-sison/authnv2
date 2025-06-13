@@ -2,18 +2,18 @@ import { ClientRepository } from "@/lib/oidc/repositories/ClientRepository";
 import { AuthorizationService } from "@/lib/oidc/services/AuthorizationService";
 import { ClientService } from "@/lib/oidc/services/ClientService";
 import { FlowService } from "@/lib/oidc/services/FlowService";
-import { OIDCConfigService } from "@/lib/oidc/services/OIDCConfigService";
-import { AuthorizationRequest, Client, OIDCProvider } from "@/lib/oidc/types/oidc";
+import { ProviderConfigService } from "@/lib/oidc/services/ProviderConfigService";
+import { AuthorizationRequest, Client, ProviderConfig } from "@/lib/oidc/types/oidc";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { AuthCodeService } from "@/lib/oidc/services/AuthCodeService";
 
 let clients: Client[];
-let baseConfig: OIDCProvider;
+let baseConfig: ProviderConfig;
 let mockClientRepository: ClientRepository;
 let mockAuthCodeService: AuthCodeService;
 let flowService: FlowService;
 let clientService: ClientService;
-let oidcConfigService: OIDCConfigService;
+let oidcConfigService: ProviderConfigService;
 let authorizationService: AuthorizationService;
 
 beforeAll(() => {
@@ -87,7 +87,7 @@ beforeAll(() => {
 
   flowService = new FlowService(mockAuthCodeService);
   clientService = new ClientService(mockClientRepository);
-  oidcConfigService = new OIDCConfigService(baseConfig);
+  oidcConfigService = new ProviderConfigService(baseConfig);
   authorizationService = new AuthorizationService(flowService, clientService, oidcConfigService);
 });
 

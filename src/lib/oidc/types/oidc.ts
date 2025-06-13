@@ -43,7 +43,7 @@ export type OIDCTokenEndpointAuthMethods =
   | "private_key_jwt"
   | "none";
 
-export type OIDCProvider = {
+export type ProviderConfig = {
   issuer: string;
   authorizationEndpoint: string;
   tokenEndpoint: string;

@@ -1,4 +1,4 @@
-import type { DiscoveryDocument, OIDCClaims, OIDCProvider } from "../types/oidc";
+import type { DiscoveryDocument, OIDCClaims, ProviderConfig } from "../types/oidc";
 import { isValidUrl } from "@/utils/isValidUrl";
 import { normalizer } from "@/utils/normalizer";
 
@@ -9,14 +9,14 @@ import { normalizer } from "@/utils/normalizer";
  * It ensures that the provided configuration complies with basic OIDC requirements
  * and exposes accessor methods to retrieve relevant configuration fields.
  */
-export class OIDCConfigService {
+export class ProviderConfigService {
   /**
    * Constructs an OIDCConfigService instance and immediately validates the configuration.
    *
    * @param config The OIDC Provider configuration object.
    * @throws Error if the configuration is invalid or missing required fields.
    */
-  constructor(private readonly config: OIDCProvider) {
+  constructor(private readonly config: ProviderConfig) {
     this.validateConfiguration();
   }
 

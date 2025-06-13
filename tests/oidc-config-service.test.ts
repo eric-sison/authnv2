@@ -1,8 +1,8 @@
-import { OIDCConfigService } from "@/lib/oidc/services/OIDCConfigService";
-import { OIDCProvider } from "@/lib/oidc/types/oidc";
+import { ProviderConfigService } from "@/lib/oidc/services/ProviderConfigService";
+import { ProviderConfig } from "@/lib/oidc/types/oidc";
 import { beforeEach, describe, expect, it } from "vitest";
 
-let baseConfig: OIDCProvider;
+let baseConfig: ProviderConfig;
 
 beforeEach(() => {
   baseConfig = {
@@ -21,115 +21,119 @@ beforeEach(() => {
 
 describe("Test validity of OIDC Config", () => {
   it("Should throw an error if issuer is missing", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, issuer: "" })).toThrowError("issuer is required!");
+    expect(() => new ProviderConfigService({ ...baseConfig, issuer: "" })).toThrowError(
+      "issuer is required!",
+    );
   });
 
   it("Should throw an error if issuer is not a valid url", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, issuer: "not a valid url" })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, issuer: "not a valid url" })).toThrowError(
       "issuer must be a valid url!",
     );
   });
 
   it("Should throw an error if authorization_endpoint is missing", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, authorizationEndpoint: "" })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, authorizationEndpoint: "" })).toThrowError(
       "authorization_endpoint is required!",
     );
   });
 
   it("Should throw an error if authorization_endpoint is not a valid url", () => {
     expect(
-      () => new OIDCConfigService({ ...baseConfig, authorizationEndpoint: "not a valid url" }),
+      () => new ProviderConfigService({ ...baseConfig, authorizationEndpoint: "not a valid url" }),
     ).toThrowError("authorization_endpoint must be a valid url!");
   });
 
   it("Should throw an error if token_endpoint is missing", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, tokenEndpoint: "" })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, tokenEndpoint: "" })).toThrowError(
       "token_endpoint is required!",
     );
   });
 
   it("Should throw an error if token_endpoint is not a valid url", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, tokenEndpoint: "not a valid url" })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, tokenEndpoint: "not a valid url" })).toThrowError(
       "token_endpoint must be a valid url!",
     );
   });
 
   it("Should throw an error if userinfo_endpoint is missing", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, userinfoEndpoint: "" })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, userinfoEndpoint: "" })).toThrowError(
       "userinfo_endpoint is required!",
     );
   });
 
   it("Should throw an error if userinfo_endpoint is not a valid url", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, userinfoEndpoint: "not a valid url" })).toThrowError(
-      "userinfo_endpoint must be a valid url!",
-    );
+    expect(
+      () => new ProviderConfigService({ ...baseConfig, userinfoEndpoint: "not a valid url" }),
+    ).toThrowError("userinfo_endpoint must be a valid url!");
   });
 
   it("Should throw an error if jwks_uri is missing", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, jwksUri: "" })).toThrowError("jwks_uri is required!");
+    expect(() => new ProviderConfigService({ ...baseConfig, jwksUri: "" })).toThrowError(
+      "jwks_uri is required!",
+    );
   });
 
   it("Should throw an error if jwks_uri is not a valid url", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, jwksUri: "not a valid url" })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, jwksUri: "not a valid url" })).toThrowError(
       "jwks_uri must be a valid url!",
     );
   });
 
   it("Should throw an error if response_types_supported is empty", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, responseTypesSupported: [] })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, responseTypesSupported: [] })).toThrowError(
       "At least one response_types_supported must be included!",
     );
   });
 
   it("Should throw an error if 'code' is missing from response_types_supported", () => {
     expect(
-      () => new OIDCConfigService({ ...baseConfig, responseTypesSupported: ["code id_token"] }),
+      () => new ProviderConfigService({ ...baseConfig, responseTypesSupported: ["code id_token"] }),
     ).toThrowError("Must include 'code' in response_types_supported!");
   });
 
   it("Should throw an error if subject_types_supported is empty", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, subjectTypesSupported: [] })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, subjectTypesSupported: [] })).toThrowError(
       "At least one subject_types_supported must be included!",
     );
   });
 
   it("Should throw an error if 'public' is missing from subject_types_supported", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, subjectTypesSupported: ["pairwise"] })).toThrowError(
-      "Must include 'public' in subject_types_supported!",
-    );
+    expect(
+      () => new ProviderConfigService({ ...baseConfig, subjectTypesSupported: ["pairwise"] }),
+    ).toThrowError("Must include 'public' in subject_types_supported!");
   });
 
   it("Should throw an error if id_token_signing_alg_values_supported is empty", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, idTokenSigningAlgValuesSupported: [] })).toThrowError(
-      "At least one id_token_signing_alg_values_supported must be included!",
-    );
+    expect(
+      () => new ProviderConfigService({ ...baseConfig, idTokenSigningAlgValuesSupported: [] }),
+    ).toThrowError("At least one id_token_signing_alg_values_supported must be included!");
   });
 
   it("Should throw an error if 'RS256' is missing from id_token_signing_alg_values_supported", () => {
     expect(
-      () => new OIDCConfigService({ ...baseConfig, idTokenSigningAlgValuesSupported: ["ES256"] }),
+      () => new ProviderConfigService({ ...baseConfig, idTokenSigningAlgValuesSupported: ["ES256"] }),
     ).toThrowError("Must include 'RS256' in id_token_signing_alg_values_supported!");
   });
 
   it("Should throw an error if scopes_supported is empty", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, scopesSupported: [] })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, scopesSupported: [] })).toThrowError(
       "At least one scopes_supported must be included!",
     );
   });
 
   it("Should throw an error if 'openid' is missing from scopes_supported", () => {
-    expect(() => new OIDCConfigService({ ...baseConfig, scopesSupported: ["address"] })).toThrowError(
+    expect(() => new ProviderConfigService({ ...baseConfig, scopesSupported: ["address"] })).toThrowError(
       "Must include 'openid' in scopes_supported!",
     );
   });
 
   it("Should create a valid config with all required fields", () => {
-    expect(() => new OIDCConfigService(baseConfig)).not.toThrow();
+    expect(() => new ProviderConfigService(baseConfig)).not.toThrow();
   });
 
   it("Should return the generated discovery document", () => {
-    const config = new OIDCConfigService(baseConfig);
+    const config = new ProviderConfigService(baseConfig);
     const discoveryDocument = config.getDiscoveryDocument();
 
     expect(discoveryDocument).toEqual({
@@ -150,7 +154,7 @@ describe("Test validity of OIDC Config", () => {
   });
 
   it("Should return correct values from getter methods", () => {
-    const config = new OIDCConfigService(baseConfig);
+    const config = new ProviderConfigService(baseConfig);
 
     expect(config.getIssuer()).toBe("https://example.com");
     expect(config.getAuthorizationEndpoint()).toBe("https://example.com/auth");
