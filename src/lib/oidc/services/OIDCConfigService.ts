@@ -1,5 +1,5 @@
+import type { DiscoveryDocument, OIDCClaims, OIDCProvider } from "../types/oidc";
 import { isValidUrl } from "@/utils/isValidUrl";
-import type { DiscoveryDocument, OIDCClaims, OIDCProvider, OIDCScopes } from "../types/oidc";
 import { normalizer } from "@/utils/normalizer";
 
 /**
