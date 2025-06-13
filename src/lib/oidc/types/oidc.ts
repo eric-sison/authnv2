@@ -87,21 +87,19 @@ export type AuthorizationRequest = {
 };
 
 export type AuthorizationResponse = {
-  // For Authorization Code flow
+  // For Authorization Code Flow
   code?: string;
-  redirect_uri?: string;
 
-  // For Implicit flows
+  // For Implicit or Hybrid flows
   access_token?: string;
   token_type?: string;
   id_token?: string;
   expires_in?: number;
 
-  // Always included
-  state?: string; // Echo back the client's state
-  nonce?: string;
+  // Always included (if provided in request)
+  state?: string;
 
-  // Error cases
+  // Error handling
   error?: string;
   error_description?: string;
   error_uri?: string;

@@ -82,9 +82,8 @@ describe("Test authorization_code flow", () => {
     expect(response.code).toBeDefined();
   });
 
-  it("Should return authorization response with state and nonce", () => {
-    const response = flowService.initiateFlow({ ...request, state: "state-001", nonce: "nonce-123" }, user);
+  it("Should return authorization response with state", () => {
+    const response = flowService.initiateFlow({ ...request, state: "state-001" }, user);
     expect(response.state).toEqual("state-001");
-    expect(response.nonce).toEqual("nonce-123");
   });
 });

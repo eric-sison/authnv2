@@ -92,15 +92,10 @@ export class OIDCFlowService {
 
     const response: AuthorizationResponse = {
       code: authorizationCode.code,
-      redirect_uri: authorizationCode.redirectUri,
     };
 
     if (request.state) {
       response.state = request.state;
-    }
-
-    if (request.nonce) {
-      response.nonce = request.nonce;
     }
 
     return response;
