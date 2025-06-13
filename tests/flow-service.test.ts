@@ -78,12 +78,12 @@ describe("Test authorization_code flow", () => {
   const flowService = new FlowService(authCodeService);
 
   it("Should return authorization response", () => {
-    const response = flowService.initiateFlow(request, user);
+    const response = flowService.initiateFlow("authorization_code", request, user);
     expect(response.code).toBeDefined();
   });
 
   it("Should return authorization response with state", () => {
-    const response = flowService.initiateFlow({ ...request, state: "state-001" }, user);
+    const response = flowService.initiateFlow("authorization_code", { ...request, state: "state-001" }, user);
     expect(response.state).toEqual("state-001");
   });
 });

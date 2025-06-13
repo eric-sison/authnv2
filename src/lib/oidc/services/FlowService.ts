@@ -19,21 +19,7 @@ import {
  * - Hybrid Flow
  */
 export class FlowService {
-  /**
-   * Holds the determined flow type for the current request.
-   */
-  private OIDCFlow: OIDCFlow | undefined;
-
   constructor(private readonly authCodeService: AuthorizationCodeService) {}
-
-  /**
-   * Returns the current flow type.
-   *
-   * @returns The determined flow type, if any.
-   */
-  public getOIDCFlow(): OIDCFlow | undefined {
-    return this.OIDCFlow;
-  }
 
   /**
    * Initiates the appropriate OpenID Connect authorization flow based on the request's response_type.
@@ -51,10 +37,8 @@ export class FlowService {
    * @returns A promise resolving to the authorization response produced by the flow.
    * @throws Error if the response_type is unsupported or unrecognized.
    */
-  public initiateFlow(request: AuthorizationRequest, user: User): AuthorizationResponse {
-    this.OIDCFlow = this.resolveOIDCFlow(request.response_type);
-
-    switch (this.OIDCFlow) {
+  public initiateFlow(flow: OIDCFlow, request: AuthorizationRequest, user: User): AuthorizationResponse {
+    switch (flow) {
       // handle authorization code flow
       case "authorization_code":
         return this.handleAuthorizationCodeFlow(request, user);
