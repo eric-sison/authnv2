@@ -42,7 +42,7 @@ describe("Test oidc flow based on requested response_type", () => {
   });
 
   it("Should return implicit: (id_token only)", () => {
-    expect(flowService.resolveOIDCFlow("ti_token")).toEqual("implicit");
+    expect(flowService.resolveOIDCFlow("id_token")).toEqual("implicit");
   });
 
   it("Should return implicit: (both tokens)", () => {
@@ -63,6 +63,13 @@ describe("Test oidc flow based on requested response_type", () => {
 
   it("Should return hybrid: (everything)", () => {
     expect(flowService.resolveOIDCFlow("code id_token token")).toEqual("hybrid");
+  });
+
+  /**
+   * Check normalization
+   */
+  it("Should return hybrid: (unordered response_type)", () => {
+    expect(flowService.resolveOIDCFlow("token code id_token")).toEqual("hybrid");
   });
 });
 
