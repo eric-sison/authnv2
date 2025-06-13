@@ -44,14 +44,14 @@ export class AuthorizationService {
    * @returns A promise that resolves to an AuthorizationResponse (token issuance logic may be implemented separately).
    * @throws Error if any validation step fails.
    */
-  async authorize(request: AuthorizationRequest, user: User | null): Promise<AuthorizationResponse> {
-    if (!user) {
-      throw new Error("Unauthenticated user");
-    }
+  // async authorize(request: AuthorizationRequest, user: User | null): Promise<AuthorizationResponse> {
+  //   if (!user) {
+  //     throw new Error("Unauthenticated user");
+  //   }
 
-    await this.validateAuthorizationRequest(request);
-    return this.flowService.initiateFlow(request, user);
-  }
+  //   await this.validateAuthorizationRequest(request);
+  //   return this.flowService.initiateFlow(request, user);
+  // }
 
   /**
    * Validates the full authorization request according to OpenID Connect and OAuth 2.0 specifications.
