@@ -120,19 +120,22 @@ describe("Test the validity of requested parameters", () => {
   it("Should throw an error if openid is not requested as a scope", async () => {
     await expect(
       authorizationService.validateAuthorizationRequest({ ...request, scope: "email profile" }),
-    ).rejects.toThrow("Requested scope/s not valid");
+    ).rejects.toThrow("Must include openid");
   });
 
   it("Should throw an error if requested an unsupported scope", async () => {
     await expect(
-      authorizationService.validateAuthorizationRequest({ ...request, scope: "openid email profile" }),
-    ).rejects.toThrow("Requested scope/s not valid");
+      authorizationService.validateAuthorizationRequest({
+        ...request,
+        scope: "openid email profile offline_access",
+      }),
+    ).rejects.toThrow("Scope not supported: email, offline_access");
   });
 
   it("Should throw an error if the requested response_type is not supported", async () => {
     await expect(
       authorizationService.validateAuthorizationRequest({ ...request, response_type: "not supported" }),
-    ).rejects.toThrow("Requested response_type is not supported");
+    ).rejects.toThrow("Unsupported response type: not supported");
   });
 
   it("Should accept requested response_type even if the order is reversed", async () => {
@@ -152,6 +155,6 @@ describe("Test the validity of requested parameters", () => {
         client_id: "1",
         response_type: "code id_token",
       }),
-    ).rejects.toThrow("Requested response_type is not allowed for client");
+    ).rejects.toThrow(`Response type "code id_token" is not allowed for client 1`);
   });
 });

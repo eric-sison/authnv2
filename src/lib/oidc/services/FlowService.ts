@@ -1,34 +1,59 @@
 import { AuthorizationRequest, AuthorizationResponse, FlowType } from "../types/oidc";
 
+/**
+ * FlowService handles the logic for determining and executing the proper
+ * OpenID Connect authorization flow based on the response_type parameter.
+ *
+ * Supported flows:
+ * - Authorization Code Flow
+ * - Implicit Flow
+ * - Hybrid Flow
+ */
 export class FlowService {
+  /**
+   * Holds the determined flow type for the current request.
+   */
   private flowType: FlowType | undefined;
 
-  public getFlowType() {
+  /**
+   * Returns the current flow type.
+   *
+   * @returns The determined flow type, if any.
+   */
+  public getFlowType(): FlowType | undefined {
     return this.flowType;
   }
 
-  public async initiateFlow(request: AuthorizationRequest) {
+  /**
+   * Initiates the authorization flow based on the provided request's response_type.
+   *
+   * @param request The authorization request to process.
+   * @returns The authorization response for the initiated flow.
+   * @throws Error if the response_type is unsupported.
+   */
+  public async initiateFlow(request: AuthorizationRequest): Promise<AuthorizationResponse> {
     this.flowType = this.setFlowType(request.response_type);
 
     switch (this.flowType) {
-      // authorization code flow
       case "authorization_code":
         return await this.handleAuthorizationCodeFlow(request);
-
-      // implicit flow
       case "implicit":
         return await this.handleImplicitFlow(request);
-
-      // hybrid flow
       case "hybrid":
         return await this.handleHybridFlow(request);
-
-      // throw error
       default:
         throw new Error(`Unsupported response_type: ${request.response_type}`);
     }
   }
 
+  /**
+   * Handles the Authorization Code flow.
+   *
+   * TODO: Implement full flow logic (validation, authentication, code issuance).
+   *
+   * @param request The authorization request.
+   * @returns A placeholder authorization response.
+   */
   private async handleAuthorizationCodeFlow(request: AuthorizationRequest): Promise<AuthorizationResponse> {
     // TODO: to be implemented
     // 1. Validate request params (e.g., response_type, client_id, scope, redirect_uri)
@@ -38,15 +63,31 @@ export class FlowService {
     return {};
   }
 
+  /**
+   * Handles the Implicit flow.
+   *
+   * TODO: Implement full flow logic (validation, authentication, token issuance).
+   *
+   * @param request The authorization request.
+   * @returns A placeholder authorization response.
+   */
   private async handleImplicitFlow(request: AuthorizationRequest): Promise<AuthorizationResponse> {
     // TODO: to be implemented
     // 1. Validate request
     // 2. Authenticate user
     // 3. Immediately issue id_token and/or access_token in fragment
-    // 4. Redirect with `#id_token=...&access_token=...&state=...`
+    // 4. Redirect with #id_token=...&access_token=...&state=...
     return {};
   }
 
+  /**
+   * Handles the Hybrid flow.
+   *
+   * TODO: Implement full flow logic (validation, authentication, mixed issuance).
+   *
+   * @param request The authorization request.
+   * @returns A placeholder authorization response.
+   */
   private async handleHybridFlow(request: AuthorizationRequest): Promise<AuthorizationResponse> {
     // TODO: to be implemented
     // 1. Validate request
@@ -56,8 +97,13 @@ export class FlowService {
     return {};
   }
 
+  /**
+   * Determines the flow type based on the requested response_type.
+   *
+   * @param responseType The response_type string from the request.
+   * @returns The determined FlowType.
+   */
   private setFlowType(responseType: string): FlowType {
-    // Split the response_type string by whitespace and sort the parts
     const parts = responseType.trim().split(/\s+/).sort();
 
     const isCode = parts.includes("code");

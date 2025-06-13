@@ -1,128 +1,130 @@
-import { isValidUrl } from "@/utils/isValidUrl";
-import { AuthorizationRequest, AuthorizationResponse, Client, OIDCScopes } from "../types/oidc";
+import { AuthorizationRequest, AuthorizationResponse, Client } from "../types/oidc";
 import { ClientService } from "./ClientService";
 import { FlowService } from "./FlowService";
 import { OIDCConfigService } from "./OIDCConfigService";
-import { normalizer } from "@/utils/normalizer";
+import { isValidUrl } from "@/utils/isValidUrl";
 
+/**
+ * AuthorizationService handles the validation and processing of OAuth 2.0 / OpenID Connect authorization requests.
+ *
+ * Responsibilities:
+ * - Validates clients, redirect URIs, scopes, and response types.
+ * - Delegates to FlowService to initiate authorization flows.
+ * - Enforces OIDC compliance before any flow processing occurs.
+ */
 export class AuthorizationService {
+  /**
+   * Constructs a new instance of AuthorizationService.
+   *
+   * @param flowService Service responsible for initiating authorization flows.
+   * @param clientService Service for accessing registered client data.
+   * @param oidcConfigService Service providing OIDC provider metadata and configuration validation.
+   */
   constructor(
     private readonly flowService: FlowService,
     private readonly clientService: ClientService,
     private readonly oidcConfigService: OIDCConfigService,
   ) {}
 
+  /**
+   * Processes an incoming authorization request by validating it and initiating the proper authorization flow.
+   *
+   * @param request The authorization request received from the client.
+   * @returns A placeholder authorization response (token issuance not yet implemented).
+   * @throws Error if any validation step fails.
+   */
   async processAuthorizationRequest(request: AuthorizationRequest): Promise<AuthorizationResponse> {
     await this.validateAuthorizationRequest(request);
-    await this.flowService.initiateFlow(request);
-
-    return {
-      access_token: "",
-      code: "",
-      error: "",
-      error_description: "",
-      error_uri: "",
-      expires_in: 0,
-      id_token: "",
-      state: "",
-      token_type: "",
-    };
+    return await this.flowService.initiateFlow(request);
   }
 
+  /**
+   * Validates the full authorization request according to OpenID Connect and OAuth 2.0 specifications.
+   *
+   * Steps:
+   * - Validates client ID and client status.
+   * - Validates provided redirect URI.
+   * - Validates scopes (must include 'openid' and only supported scopes).
+   * - Validates response type against provider and client configurations.
+   *
+   * @param request The authorization request to validate.
+   * @throws Error if any validation fails.
+   */
   public async validateAuthorizationRequest(request: AuthorizationRequest): Promise<void> {
-    // Check that the client exists in your system.
-    // Make sure client is registered and allowed to use requested flow.
-    const client = await this.clientService.getRepository().findById(request.client_id);
+    const client = await this.clientService.validateClient(request.client_id);
 
-    if (!client) {
-      throw new Error(`Client is not registered: ${request.client_id}`);
-    }
-
-    // Verify the client is not disabled or revoked.
-    if (!client.active) {
-      throw new Error(`Client is disabled.`);
-    }
-
-    const redirectUriValid = this.isRedirectUriValid(client, request.redirect_uri);
-
-    if (!redirectUriValid) {
-      throw new Error(`Requested redirect_uri is not valid ${request.redirect_uri}`);
-    }
-
-    const scopesValid = this.isScopeValid(request.scope);
-
-    if (!scopesValid) {
-      throw new Error(`Requested scope/s not valid: ${request.scope}`);
-    }
-
-    const responseTypeSupported = this.isResponseTypeSupported(request.response_type);
-
-    if (!responseTypeSupported) {
-      throw new Error(`Requested response_type is not supported: ${request.response_type}`);
-    }
-
-    const responseTypeAllowed = this.isResponseTypeAllowedForClient(client, request.response_type);
-
-    if (!responseTypeAllowed) {
-      throw new Error(`Requested response_type is not allowed for client ${request.client_id}`);
-    }
+    this.validateRedirectUri(client, request.redirect_uri);
+    this.validateScope(request.scope);
+    this.assertResponseTypeSupported(request.response_type);
+    this.assertResponseTypeAllowedForClient(client, request.response_type);
   }
 
-  private validateClient(id: string) {}
-
-  private validateRedirectUri(client: Client, redirectUri: string) {}
-
-  private validateScope(scope: string) {}
-
-  private checkIfResponseTypeIsSupported(responseType: string) {}
-
-  private checkIfResponseTypeIsAllowedForClient(client: Client, responseType: string) {}
-
-  private isRedirectUriValid(client: Client, uri: string) {
+  /**
+   * Validates that the provided redirect URI is properly formatted and registered for the client.
+   *
+   * @param client The client object containing registered redirect URIs.
+   * @param uri The redirect URI to validate.
+   * @throws Error if URI is invalid or not registered.
+   */
+  private validateRedirectUri(client: Client, uri: string): void {
     if (!isValidUrl(uri)) {
-      return false;
+      throw new Error("Requested redirect_uri is not valid");
     }
 
-    return client.redirectUris.includes(uri);
+    const uriAllowed = this.clientService.isRedirectUriAllowed(client, uri);
+
+    if (!uriAllowed) {
+      throw new Error("Requested redirect_uri is not valid");
+    }
   }
 
-  // The scope parameter is REQUIRED and MUST contain the openid scope value.
-  private isScopeValid(scope: string) {
-    const requestedScopes = scope
-      .trim()
-      .split(/\s+/)
-      .map((s) => s.toLowerCase());
+  /**
+   * Validates the requested scopes:
+   * - Ensures 'openid' is always included.
+   * - Ensures all requested scopes are supported by the provider.
+   *
+   * @param scope Space-delimited list of requested scopes.
+   * @throws Error if 'openid' is missing or if any scope is unsupported.
+   */
+  private validateScope(scope: string): void {
+    const isValid = this.oidcConfigService.isOpenIdIncluded(scope);
+    const isSupported = this.oidcConfigService.isScopeSupported(scope);
 
-    const supportedScopes = this.oidcConfigService.getDiscoveryDocument().scopes_supported;
-
-    // Must include 'openid'
-    if (!requestedScopes.includes("openid")) {
-      return false;
+    if (!isValid) {
+      throw new Error("Must include openid");
     }
 
-    // Every requested scope must be supported
-    for (const scope of requestedScopes) {
-      if (!supportedScopes.includes(scope as OIDCScopes)) {
-        return false;
-      }
+    if (!isSupported.valid) {
+      throw new Error(`Scope not supported: ${isSupported.unsupportedScopes.join(", ")}`);
     }
-
-    return true;
   }
 
-  private isResponseTypeSupported(responseType: string): boolean {
-    // The provider needs to verify that the incoming response_type string matches one of its
-    // supported response types (exact combination, but ordering is flexible).
-    const normalizedRequested = normalizer(responseType);
-    const supportedResponseTypes = this.oidcConfigService.getDiscoveryDocument().response_types_supported;
-    return supportedResponseTypes.some((allowed) => normalizer(allowed) === normalizedRequested);
+  /**
+   * Validates whether the requested response type is supported by the authorization server (globally supported).
+   *
+   * @param responseType The requested response_type value.
+   * @throws Error if response type is not supported.
+   */
+  private assertResponseTypeSupported(responseType: string): void {
+    const isSupported = this.oidcConfigService.isResponseTypeSupported(responseType);
+
+    if (!isSupported) {
+      throw new Error(`Unsupported response type: ${responseType}`);
+    }
   }
 
-  private isResponseTypeAllowedForClient(client: Client, responseType: string): boolean {
-    // Normalize because response_type parameters are space-delimited but ordering isn't strictly defined
-    // The spec says "code id_token" is equivalent to "id_token code"
-    // Normalization makes the comparison order-insensitive
-    const normalizedRequested = normalizer(responseType);
-    return client.responseTypes.some((allowed) => normalizer(allowed) === normalizedRequested);
+  /**
+   * Validates whether the requested response type is allowed for the particular client.
+   *
+   * @param client The client requesting authorization.
+   * @param responseType The response_type requested.
+   * @throws Error if client is not allowed to use this response type.
+   */
+  private assertResponseTypeAllowedForClient(client: Client, responseType: string): void {
+    const isAllowed = this.clientService.isResponseTypeAllowed(client, responseType);
+
+    if (!isAllowed) {
+      throw new Error(`Response type "${responseType}" is not allowed for client ${client.clientId}`);
+    }
   }
 }

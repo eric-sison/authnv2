@@ -1,12 +1,34 @@
 import { isValidUrl } from "@/utils/isValidUrl";
-import type { DiscoveryDocument, OIDCProvider } from "../types/oidc";
+import type { DiscoveryDocument, OIDCClaims, OIDCProvider, OIDCScopes } from "../types/oidc";
+import { normalizer } from "@/utils/normalizer";
 
+/**
+ * OIDCConfigService is responsible for validating and providing access to
+ * the OpenID Connect Provider configuration metadata.
+ *
+ * It ensures that the provided configuration complies with basic OIDC requirements
+ * and exposes accessor methods to retrieve relevant configuration fields.
+ */
 export class OIDCConfigService {
+  /**
+   * Constructs an OIDCConfigService instance and immediately validates the configuration.
+   *
+   * @param config The OIDC Provider configuration object.
+   * @throws Error if the configuration is invalid or missing required fields.
+   */
   constructor(private readonly config: OIDCProvider) {
     this.validateConfiguration();
   }
 
-  private validateConfiguration() {
+  /**
+   * Validates the provided OIDC Provider configuration for required fields and constraints.
+   *
+   * Ensures mandatory endpoints, response types, subject types, algorithms, and scopes
+   * are present and properly formatted.
+   *
+   * @throws Error if any validation rule fails.
+   */
+  private validateConfiguration(): void {
     // Issuer validation
     if (!this.config.issuer) {
       throw new Error("issuer is required!");
@@ -70,7 +92,7 @@ export class OIDCConfigService {
       throw new Error("Must include 'public' in subject_types_supported!");
     }
 
-    // Signing algorithms validation
+    // ID Token signing algorithms validation
     if (this.config.idTokenSigningAlgValuesSupported.length === 0) {
       throw new Error("At least one id_token_signing_alg_values_supported must be included!");
     }
@@ -90,61 +112,137 @@ export class OIDCConfigService {
   }
 
   /**
-   *  Getter functions
+   * Accessor for issuer.
    */
-
-  public getIssuer() {
+  public getIssuer(): string {
     return this.config.issuer;
   }
 
-  public getAuthorizationEndpoint() {
+  /**
+   * Accessor for authorization endpoint.
+   */
+  public getAuthorizationEndpoint(): string {
     return this.config.authorizationEndpoint;
   }
 
-  public getTokenEndpoint() {
+  /**
+   * Accessor for token endpoint.
+   */
+  public getTokenEndpoint(): string {
     return this.config.tokenEndpoint;
   }
 
-  public getUserinfoEndpoint() {
+  /**
+   * Accessor for userinfo endpoint.
+   */
+  public getUserinfoEndpoint(): string {
     return this.config.userinfoEndpoint;
   }
 
-  public getJwksUri() {
+  /**
+   * Accessor for JWKS URI.
+   */
+  public getJwksUri(): string {
     return this.config.jwksUri;
   }
 
-  public getResponseTypesSupported() {
+  /**
+   * Accessor for supported response types.
+   */
+  public getResponseTypesSupported(): string[] {
     return this.config.responseTypesSupported;
   }
 
-  public getSubjectTypesSupported() {
+  /**
+   * Accessor for supported subject types.
+   */
+  public getSubjectTypesSupported(): string[] {
     return this.config.subjectTypesSupported;
   }
 
-  public getIdTokenSigningAlgValuesSupported() {
+  /**
+   * Accessor for supported ID token signing algorithms.
+   */
+  public getIdTokenSigningAlgValuesSupported(): string[] {
     return this.config.idTokenSigningAlgValuesSupported;
   }
 
-  public getScopesSupported() {
+  /**
+   * Accessor for supported scopes.
+   */
+  public getScopesSupported(): string[] {
     return this.config.scopesSupported;
   }
 
-  public getClaimsSupported() {
+  /**
+   * Accessor for supported claims.
+   */
+  public getClaimsSupported(): OIDCClaims[] | undefined {
     return this.config.claimsSupported;
   }
 
-  public getTokenEndpointAuthMethodsSupported() {
+  /**
+   * Accessor for supported token endpoint authentication methods.
+   */
+  public getTokenEndpointAuthMethodsSupported(): string[] | undefined {
     return this.config.tokenEndpointAuthMethodsSupported;
   }
 
-  public getGrantTypesSupported() {
+  /**
+   * Accessor for supported grant types.
+   */
+  public getGrantTypesSupported(): string[] | undefined {
     return this.config.grantTypesSupported;
   }
 
-  public getCodeChallengeMethodsSupported() {
+  /**
+   * Accessor for supported PKCE code challenge methods.
+   */
+  public getCodeChallengeMethodsSupported(): string[] | undefined {
     return this.config.codeChallengeMethodsSupported;
   }
 
+  public isResponseTypeSupported(responseType: string) {
+    const normalizedRequested = normalizer(responseType);
+    const supportedResponseTypes = this.config.responseTypesSupported;
+
+    return supportedResponseTypes.some((allowed) => normalizer(allowed) === normalizedRequested);
+  }
+
+  public isOpenIdIncluded(scope: string) {
+    const requestedScopes = scope
+      .trim()
+      .split(/\s+/)
+      .map((s) => s.toLowerCase());
+
+    if (!requestedScopes.includes("openid")) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public isScopeSupported(scope: string) {
+    const supportedScopes = this.config.scopesSupported.map((s) => s.toLowerCase());
+    const requestedScopes = scope
+      .trim()
+      .split(/\s+/)
+      .map((s) => s.toLowerCase());
+
+    const unsupportedScopes = requestedScopes.filter((s) => !supportedScopes.includes(s));
+
+    return {
+      valid: unsupportedScopes.length === 0,
+      unsupportedScopes,
+    };
+  }
+
+  /**
+   * Returns the full discovery document as expected by OIDC Discovery specification.
+   * Default values are provided for optional fields if not supplied.
+   *
+   * @returns The discovery document.
+   */
   public getDiscoveryDocument(): DiscoveryDocument {
     return {
       issuer: this.config.issuer,
