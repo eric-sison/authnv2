@@ -131,6 +131,10 @@ export class FlowService {
     const isToken = parts.includes("token");
     const isIdToken = parts.includes("id_token");
 
+    if (!isCode && !isToken && !isIdToken) {
+      throw new Error(`Invalid response_type: ${responseType}`);
+    }
+
     if (isCode && (isToken || isIdToken)) {
       return "hybrid";
     }
