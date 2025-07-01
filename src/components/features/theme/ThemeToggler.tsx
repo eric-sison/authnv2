@@ -1,18 +1,21 @@
 "use client";
 
-import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/DropdownMenu";
+import { FunctionComponent } from "react";
 
-export const ThemeToggler: React.FunctionComponent = () => {
+type ThemeTogglerProps = {
+  align?: "center" | "end" | "start";
+};
+
+export const ThemeToggler: FunctionComponent<ThemeTogglerProps> = ({ align = "center" }) => {
   const { setTheme } = useTheme();
 
   return (
@@ -24,7 +27,7 @@ export const ThemeToggler: React.FunctionComponent = () => {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align={align}>
         <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
