@@ -1,6 +1,6 @@
 //import { AuthorizationCodeRepository } from "../repositories/AuthorizationCodeRepository";
 import { AuthorizationCode, AuthorizationCodePayload } from "../types/oidc";
-import cuid from "cuid";
+import { createId } from "@paralleldrive/cuid2";
 
 export class AuthorizationCodeService {
   // constructor(private readonly authCodeRepository: AuthorizationCodeRepository) {}
@@ -8,7 +8,7 @@ export class AuthorizationCodeService {
   private readonly codeExpirationTime: number = 600; // 10 minutes
 
   public generateAuthCode(payload: AuthorizationCodePayload, expiration?: number) {
-    const code = cuid();
+    const code = createId();
     const expiresAt = expiration
       ? new Date(Date.now() + expiration * 1000)
       : new Date(Date.now() + this.codeExpirationTime * 1000);

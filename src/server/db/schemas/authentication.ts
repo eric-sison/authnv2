@@ -1,10 +1,10 @@
+import { createId } from "@paralleldrive/cuid2";
 import { pgTable, text, timestamp, boolean, integer, date } from "drizzle-orm/pg-core";
-import cuid from "cuid";
 
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => cuid()),
+    .$defaultFn(() => createId()),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified")
@@ -37,7 +37,7 @@ export const users = pgTable("users", {
 export const sessions = pgTable("sessions", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => cuid()),
+    .$defaultFn(() => createId()),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at").notNull(),
@@ -52,7 +52,7 @@ export const sessions = pgTable("sessions", {
 export const accounts = pgTable("accounts", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => cuid()),
+    .$defaultFn(() => createId()),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
   userId: text("user_id")
@@ -76,7 +76,7 @@ export const accounts = pgTable("accounts", {
 export const verifications = pgTable("verifications", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => cuid()),
+    .$defaultFn(() => createId()),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
@@ -91,7 +91,7 @@ export const verifications = pgTable("verifications", {
 export const passkeys = pgTable("passkeys", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => cuid()),
+    .$defaultFn(() => createId()),
   name: text("name"),
   publicKey: text("public_key").notNull(),
   userId: text("user_id")
