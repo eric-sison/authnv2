@@ -1,7 +1,7 @@
 import { I_AuthCodeRepository } from "../interfaces/IAuthCodeRepository";
 import { AuthorizationCode } from "../types/oidc";
 
-export class AuthCodeRepository implements I_AuthCodeRepository {
+export class AuthorizationCodeRepository implements I_AuthCodeRepository {
   public async save(authCode: AuthorizationCode): Promise<void> {
     throw new Error("Method not implemented.");
   }
